@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-100;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200;
+  }
+
+  .kanban-column {
+    @apply bg-white rounded-xl shadow-lg p-6 flex flex-col h-[calc(100vh-12rem)] min-h-[500px] border-t-4 relative overflow-hidden;
+  }
+
+  .kanban-column-nova {
+    @apply border-blue-500 bg-gradient-to-b from-blue-50/50 to-white;
+  }
+
+  .kanban-column-investigacao {
+    @apply border-yellow-500 bg-gradient-to-b from-yellow-50/50 to-white;
+  }
+
+  .kanban-column-concluida {
+    @apply border-green-500 bg-gradient-to-b from-green-50/50 to-white;
+  }
+
+  .kanban-column-arquivada {
+    @apply border-gray-400 bg-gradient-to-b from-gray-50/50 to-white;
+  }
+
+  .kanban-header {
+    @apply rounded-lg p-4 mb-6 border-b border-gray-100;
+  }
+
+  .kanban-card {
+    @apply bg-white p-4 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition-all duration-200 border border-gray-100 hover:border-blue-500/20 relative mt-4;
+  }
+
+  /* Estilos específicos para cards arquivados */
+  .kanban-card[data-status="arquivada"] {
+    @apply py-2 px-4 min-h-0 h-auto;
+  }
+
+  .kanban-card[data-status="arquivada"] p,
+  .kanban-card[data-status="arquivada"] div:not(:first-child) {
+    @apply !hidden;
+  }
+
+  .kanban-card[data-status="arquivada"] h3 {
+    @apply !m-0 !text-gray-600 !text-sm !font-normal;
+  }
+
+  .kanban-card h3 {
+    @apply truncate;
+  }
+
+  .kanban-card p {
+    @apply break-words whitespace-pre-wrap;
+  }
+
+  .kanban-scroll {
+    @apply flex-1 overflow-y-auto space-y-4 pr-2;
+  }
+
+  .text-content {
+    @apply break-words whitespace-pre-wrap font-sans;
+  }
+
+  .text-area {
+    @apply w-full border border-gray-300 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 resize-none min-h-[100px] max-h-[200px] overflow-y-auto whitespace-pre-wrap;
+  }
+
+  .text-display {
+    @apply bg-white p-3 rounded border border-gray-200 overflow-y-auto max-h-[200px] whitespace-pre-wrap break-words;
+  }
+}
+
+/* Custom Scrollbar */
+.kanban-scroll::-webkit-scrollbar,
+.text-area::-webkit-scrollbar,
+.text-display::-webkit-scrollbar {
+  width: 6px;
+}
+
+.kanban-scroll::-webkit-scrollbar-track,
+.text-area::-webkit-scrollbar-track,
+.text-display::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.kanban-scroll::-webkit-scrollbar-thumb,
+.text-area::-webkit-scrollbar-thumb,
+.text-display::-webkit-scrollbar-thumb {
+  background-color: #E5E7EB;
+  border-radius: 3px;
+}
+
+.kanban-scroll::-webkit-scrollbar-thumb:hover,
+.text-area::-webkit-scrollbar-thumb:hover,
+.text-display::-webkit-scrollbar-thumb:hover {
+  background-color: #D1D5DB;
+}

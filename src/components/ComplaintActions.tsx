@@ -3,7 +3,7 @@ import { X, Pencil } from 'lucide-react';
 import { Action, ActionStatus, ActionType, Complaint } from '../types';
 import { updateComplaint } from '../lib/complaintService';
 import { useAuth } from '../contexts/AuthContext';
-import { useUsers } from '../hooks/useUsers';
+import { useEntraUsers } from '../hooks/useEntraUsers';
 
 interface ComplaintActionsProps {
   currentComplaint: Partial<Complaint>;
@@ -21,8 +21,7 @@ export function ComplaintActions({
   handleFileChange
 }: ComplaintActionsProps) {
   const { user } = useAuth();
-  const { users } = useUsers();
-  const activeUsers = users.filter(user => user.active);
+  const { users: entraUsers } = useEntraUsers();
 
   const handleAddAction = async () => {
     if (
@@ -166,11 +165,10 @@ export function ComplaintActions({
                 }
               })}
               value={editingComplaint?.newAction?.responsible || ''}
-              required
             >
               <option value="">Selecione o responsável</option>
-              {activeUsers.map(user => (
-                <option key={user.id} value={user.name}>{user.name}</option>
+              {entraUsers.map(user => (
+                <option key={user.id} value={user.displayName}>{user.displayName}</option>
               ))}
             </select>
           </div>

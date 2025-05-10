@@ -3,11 +3,35 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
-import { Complaint } from '../types';
+import { Complaint, ProcedenciaType, ActionStatus } from '../types';
 import { PieChart as ChartPie, Clock, FileText } from 'lucide-react';
 
 interface DashboardProps {
   complaints: Complaint[];
+}
+
+interface MonthlyData {
+  month: string;
+  [year: string]: number | string;
+}
+
+interface YearData {
+  month: string;
+  count: number;
+}
+
+interface ChartData {
+  name: string;
+  value: number;
+}
+
+interface PieLabelProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
 }
 
 export function Dashboard({ complaints }: DashboardProps) {
@@ -28,12 +52,12 @@ export function Dashboard({ complaints }: DashboardProps) {
 
   // Monthly trend data grouped by year
   const monthlyData = useMemo(() => {
-    const data = {};
+    const data: { [year: number]: YearData[] } = {};
     
+    // Initialize data structure for all years in the dataset
     complaints.forEach(complaint => {
       const date = new Date(complaint.receivedDate);
       const year = date.getFullYear();
-      const month = date.getMonth();
       
       if (!data[year]) {
         data[year] = Array.from({ length: 12 }, (_, i) => ({
@@ -41,25 +65,38 @@ export function Dashboard({ complaints }: DashboardProps) {
           count: 0
         }));
       }
+    });
+
+    // Count complaints for each month
+    complaints.forEach(complaint => {
+      const date = new Date(complaint.receivedDate);
+      const year = date.getFullYear();
+      const month = date.getMonth();
       
-      data[year][month].count++;
+      if (data[year] && data[year][month]) {
+        data[year][month].count++;
+      }
     });
 
     // Convert to format suitable for stacked bar chart
-    const months = Array.from({ length: 12 }, (_, i) => ({
-      month: new Date(2000, i, 1).toLocaleString('pt-BR', { month: 'short' }),
-      ...Object.keys(data).reduce((acc, year) => ({
-        ...acc,
-        [year]: data[year][i].count
-      }), {})
-    }));
+    const months: MonthlyData[] = Array.from({ length: 12 }, (_, i) => {
+      const monthData: MonthlyData = {
+        month: new Date(2000, i, 1).toLocaleString('pt-BR', { month: 'short' })
+      };
+
+      Object.entries(data).forEach(([year, yearData]) => {
+        monthData[year] = yearData[i].count;
+      });
+
+      return monthData;
+    });
 
     return months;
   }, [complaints]);
 
   // Categories data
   const categoriesData = useMemo(() => {
-    const categories = {};
+    const categories: { [key: string]: number } = {};
     complaints.forEach(complaint => {
       categories[complaint.category] = (categories[complaint.category] || 0) + 1;
     });
@@ -68,7 +105,7 @@ export function Dashboard({ complaints }: DashboardProps) {
 
   // Characteristics data
   const characteristicsData = useMemo(() => {
-    const chars = {};
+    const chars: { [key: string]: number } = {};
     complaints.forEach(complaint => {
       chars[complaint.characteristic] = (chars[complaint.characteristic] || 0) + 1;
     });
@@ -77,7 +114,7 @@ export function Dashboard({ complaints }: DashboardProps) {
 
   // Procedência data
   const procedenciaData = useMemo(() => {
-    const proc = {};
+    const proc: { [key in ProcedenciaType]?: number } = {};
     complaints.forEach(complaint => {
       if (complaint.conclusion?.procedencia) {
         proc[complaint.conclusion.procedencia] = (proc[complaint.conclusion.procedencia] || 0) + 1;
@@ -88,7 +125,7 @@ export function Dashboard({ complaints }: DashboardProps) {
 
   // Status data
   const statusData = useMemo(() => {
-    const status = {
+    const status: { [key: string]: number } = {
       'Nova Denúncia': 0,
       'Em Investigação': 0,
       'Concluída': 0,
@@ -117,7 +154,7 @@ export function Dashboard({ complaints }: DashboardProps) {
 
   // Action status data
   const actionStatusData = useMemo(() => {
-    const status = {};
+    const status: { [key in ActionStatus]?: number } = {};
     complaints.forEach(complaint => {
       complaint.actions?.forEach(action => {
         status[action.status] = (status[action.status] || 0) + 1;
@@ -128,7 +165,7 @@ export function Dashboard({ complaints }: DashboardProps) {
 
   // Action types data
   const actionTypesData = useMemo(() => {
-    const types = {};
+    const types: { [key: string]: number } = {};
     complaints.forEach(complaint => {
       complaint.actions?.forEach(action => {
         types[action.type] = (types[action.type] || 0) + 1;
@@ -151,7 +188,7 @@ export function Dashboard({ complaints }: DashboardProps) {
     '#82CA9D', '#FF7C7C', '#A4DE6C', '#D0ED57', '#FFC658'
   ];
 
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelProps) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * Math.PI / 180);
     const y = cy + radius * Math.sin(-midAngle * Math.PI / 180);

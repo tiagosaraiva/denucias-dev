@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User } from '../types';
-import { supabase } from '../lib/supabase';
+
+const API_URL = process.env.VITE_API_URL || 'http://localhost:3000';
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
@@ -14,17 +15,17 @@ export function useUsers() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('name', { ascending: true });
+      const response = await fetch(`${API_URL}/api/users`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
+      }
 
-      if (error) throw error;
-
-      setUsers(data || []);
+      const data = await response.json();
+      setUsers(data);
     } catch (err) {
       console.error('Error fetching users:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }

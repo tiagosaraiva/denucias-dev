@@ -1,20 +1,21 @@
-import { User } from '@supabase/supabase-js';
-
 export type UserRole = 'admin' | 'manager' | 'user';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  password: string;
   role: UserRole;
   active: boolean;
 }
 
 export interface HistoryEntry {
-  timestamp: string;
-  user: string;
+  id: string;
+  complaint_id: string;
   field: string;
+  old_value?: string;
+  new_value: string;
+  change_type: 'create' | 'update' | 'delete';
+  user_name: string;
   oldValue: any;
   newValue: any;
   type: 'update' | 'create' | 'delete';
@@ -80,8 +81,8 @@ export interface Complaint {
   characteristic: string;
   responsibleInstance: string;
   removedMember?: string;
-  responsible1: string;
-  responsible2: string;
+  responsible1?: string;
+  responsible2?: string;
   receivedDate: string;
   complaintAttachment?: string;
   evidenceAttachment?: string;

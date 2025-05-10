@@ -46,6 +46,7 @@ export function App() {
     history: []
   });
 
+
   useEffect(() => {
     loadComplaints();
   }, [user]); // Recarrega quando o usuário mudar
@@ -57,6 +58,12 @@ export function App() {
   }, [isAuthenticated, user]);
 
   const loadComplaints = async () => {
+
+
+    console.log('TESTE app');
+    console.log('VITE_API_URL:', import.meta.env);
+    
+
     try {
       setIsLoading(true);
       const data = await fetchComplaints(user);
@@ -191,7 +198,13 @@ export function App() {
       await loadComplaints();
       handleCloseModal();
     } catch (error) {
+
+      const now_date3 = new Date();
+      console.log('saving: '+now_date3.toISOString());
+
       console.error('Error saving complaint:', error);
+      
+      
       alert(error.message || 'Erro ao salvar denúncia. Por favor, tente novamente.');
     }
   };

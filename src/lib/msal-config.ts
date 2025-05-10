@@ -1,4 +1,3 @@
-
 import { Configuration, LogLevel, PublicClientApplication } from '@azure/msal-browser';
 
 // MSAL configuration
@@ -14,7 +13,7 @@ const msalConfig: Configuration = {
   },
   system: {
     loggerOptions: {
-      loggerCallback: (level, message, containsPii) => {
+      loggerCallback: (level: LogLevel, message: string, containsPii: boolean) => {
         if (containsPii) {
           return;
         }
@@ -40,7 +39,7 @@ const msalConfig: Configuration = {
 
 // Authentication request scopes
 export const loginRequest = {
-  scopes: ['User.Read']
+  scopes: ['User.Read', 'User.ReadBasic.All']
 };
 
 // Initialize MSAL instance

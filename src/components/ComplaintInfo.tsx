@@ -1,7 +1,8 @@
 import React from 'react';
 import { Upload } from 'lucide-react';
-import { Complaint, User } from '../types';
-import { useUsers } from '../hooks/useUsers';
+import { Complaint } from '../types';
+import { useEntraUsers } from '../hooks/useEntraUsers';
+import { SearchableCombobox } from './SearchableCombobox';
 
 interface ComplaintInfoProps {
   currentComplaint: Partial<Complaint>;
@@ -31,11 +32,8 @@ export function ComplaintInfo({
   handleFileChange
 }: ComplaintInfoProps) {
   const isArchived = currentComplaint.status === 'arquivada';
-  const { users } = useUsers();
+  const { users: entraUsers } = useEntraUsers();
   
-  // Filter only active users
-  const activeUsers = users.filter(user => user.active);
-
   return (
     <div className="grid grid-cols-2 gap-6">
       {/* Category */}
@@ -158,8 +156,8 @@ export function ComplaintInfo({
             value={currentComplaint.removedMember || ''}
           >
             <option value="">Selecione o membro afastado</option>
-            {activeUsers.map(user => (
-              <option key={user.id} value={user.name}>{user.name}</option>
+            {entraUsers.map(user => (
+              <option key={user.id} value={user.displayName}>{user.displayName}</option>
             ))}
           </select>
         </div>
@@ -170,23 +168,14 @@ export function ComplaintInfo({
         <label className={`block text-sm font-medium ${isArchived ? 'text-gray-500' : 'text-gray-700'} mb-1`}>
           Responsável 1
         </label>
-        <select
-          name="responsible1"
-          required
-          disabled={isArchived}
-          className={`w-full border border-gray-300 rounded-lg p-2 ${
-            isArchived 
-              ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
-              : 'focus:ring-blue-500 focus:border-blue-500'
-          }`}
-          onChange={handleInputChange}
+        <SearchableCombobox
           value={currentComplaint.responsible1 || ''}
-        >
-          <option value="">Selecione o responsável</option>
-          {activeUsers.map(user => (
-            <option key={user.id} value={user.name}>{user.name}</option>
-          ))}
-        </select>
+          onChange={(value) => handleInputChange({ target: { name: 'responsible1', value } } as React.ChangeEvent<HTMLSelectElement>)}
+          options={entraUsers}
+          placeholder="Selecione o responsável"
+          disabled={isArchived}
+          className={isArchived ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}
+        />
       </div>
 
       {/* Responsible 2 */}
@@ -194,25 +183,14 @@ export function ComplaintInfo({
         <label className={`block text-sm font-medium ${isArchived ? 'text-gray-500' : 'text-gray-700'} mb-1`}>
           Responsável 2
         </label>
-        <select
-          name="responsible2"
-          required
-          disabled={isArchived}
-          className={`w-full border border-gray-300 rounded-lg p-2 ${
-            isArchived 
-              ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
-              : 'focus:ring-blue-500 focus:border-blue-500'
-          }`}
-          onChange={handleInputChange}
+        <SearchableCombobox
           value={currentComplaint.responsible2 || ''}
-        >
-          <option value="">Selecione o responsável</option>
-          {activeUsers
-            .filter(user => user.name !== currentComplaint.responsible1)
-            .map(user => (
-              <option key={user.id} value={user.name}>{user.name}</option>
-            ))}
-        </select>
+          onChange={(value) => handleInputChange({ target: { name: 'responsible2', value } } as React.ChangeEvent<HTMLSelectElement>)}
+          options={entraUsers.filter(user => user.displayName !== currentComplaint.responsible1)}
+          placeholder="Selecione o responsável"
+          disabled={isArchived}
+          className={isArchived ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}
+        />
       </div>
 
       {/* Received Date */}

@@ -1,0 +1,32 @@
+FROM mcr.microsoft.com/mssql/server:2022-latest
+
+# Install SQL Server tools
+USER root
+RUN apt-get update && apt-get install -y curl gnupg2
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+RUN curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+RUN apt-get update && ACCEPT_EULA=Y apt-get install -y mssql-tools
+RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Copy initialization script
+COPY ./src/database/init.sql /docker-entrypoint-initdb.d/
+COPY ./src/database/init.sh /docker-entrypoint-initdb.d/
+
+# Grant permissions to the initialization script
+RUN chmod +x /docker-entrypoint-initdb.d/init.sh
+
+# Switch back to mssql user
+USER mssql
+
+ENV ACCEPT_EULA=Y
+ENV SA_PASSWORD=YourStrong!Passw0rd
+ENV MSSQL_PID=Express
+
+# Expose port 1433
+EXPOSE 1433
+
+# Run SQL Server and initialization script
+CMD /bin/bash /docker-entrypoint-initdb.d/init.sh & /opt/mssql/bin/sqlservr 

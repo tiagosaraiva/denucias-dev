@@ -1,30 +1,63 @@
-
 version: '3.8'
 
 services:
-  app:
-    build: 
+  frontend:
+    build:
       context: .
-      target: production
-    container_name: system-complaint
-    restart: unless-stopped
+      dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "5173:80"
     environment:
-      - NODE_ENV=production
-      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
-      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
-      - VITE_MSAL_TENANT_ID=${VITE_MSAL_TENANT_ID}
-      - VITE_MSAL_CLIENT_ID=${VITE_MSAL_CLIENT_ID}
-    healthcheck:
-      test: wget --quiet --tries=1 --spider http://localhost:80/ || exit 1
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 5s
+      - VITE_API_URL=http://localhost:3000/api
+    depends_on:
+      - backend
     networks:
       - app-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_USER=sa
+      - DB_PASSWORD=YourStrong!Passw0rd
+      - DB_SERVER=mssql
+      - DB_NAME=complaints_db
+      - CORS_ORIGIN=http://localhost:5173
+    depends_on:
+      mssql:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  mssql:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    networks:
+      - app-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mssql_data:

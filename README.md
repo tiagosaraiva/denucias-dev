@@ -1,69 +1,122 @@
-# Welcome to your Lovable project
+# Sistema de Gestão de Denúncias
 
-## Project info
+Este é um sistema para gerenciamento de denúncias que utiliza React no frontend, Express no backend e SQL Server como banco de dados. Todo o sistema é containerizado usando Docker.
 
-**URL**: https://lovable.dev/projects/74bcd3e4-a5a9-405a-9f33-9db924014e64
+## Requisitos
 
-## How can I edit this code?
+- Docker
+- Docker Compose
 
-There are several ways of editing your application.
+## Configuração
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/74bcd3e4-a5a9-405a-9f33-9db924014e64) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Clone o repositório:
+```bash
+git clone <repository-url>
+cd <repository-name>
 ```
 
-**Edit a file directly in GitHub**
+2. Configure as variáveis de ambiente:
+   - Frontend (.env):
+     ```
+     VITE_API_URL=http://localhost:3000/api
+     ```
+   - Backend (backend/.env):
+     ```
+     PORT=3000
+     NODE_ENV=development
+     DB_USER=sa
+     DB_PASSWORD=YourStrong!Passw0rd
+     DB_SERVER=mssql
+     DB_NAME=complaints_db
+     CORS_ORIGIN=http://localhost:5173
+     ```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Executando o projeto
 
-**Use GitHub Codespaces**
+1. Inicie os containers:
+```bash
+docker-compose up -d
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Aguarde alguns segundos para que o SQL Server inicialize e o script de criação do banco seja executado.
 
-## What technologies are used for this project?
+3. Acesse a aplicação:
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:3000/api
+   - SQL Server: localhost:1433
 
-This project is built with .
+## Estrutura do Projeto
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+.
+├── frontend/                # Aplicação React
+│   ├── src/                # Código fonte do frontend
+│   ├── public/             # Arquivos públicos
+│   └── Dockerfile          # Configuração do container do frontend
+│
+├── backend/                # API Express
+│   ├── src/               # Código fonte do backend
+│   │   ├── controllers/   # Controladores da API
+│   │   ├── models/        # Modelos de dados
+│   │   ├── routes/        # Rotas da API
+│   │   └── database/      # Scripts e configurações do banco
+│   └── Dockerfile         # Configuração do container do backend
+│
+└── docker-compose.yml      # Configuração dos serviços Docker
+```
 
-## How can I deploy this project?
+## API Endpoints
 
-Simply open [Lovable](https://lovable.dev/projects/74bcd3e4-a5a9-405a-9f33-9db924014e64) and click on Share -> Publish.
+### Denúncias
+- `GET /api/complaints` - Lista todas as denúncias
+- `GET /api/complaints/:id` - Obtém uma denúncia específica
+- `POST /api/complaints` - Cria uma nova denúncia
+- `PUT /api/complaints/:id` - Atualiza uma denúncia
+- `DELETE /api/complaints/:id` - Remove uma denúncia
+- `GET /api/complaints/status-summary` - Resumo por status
+- `GET /api/complaints/by-category` - Resumo por categoria
 
-## I want to use a custom domain - is that possible?
+### Procedimentos
+- `POST /api/procedures` - Cria um novo procedimento
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+### Entrevistas
+- `POST /api/interviews` - Cria uma nova entrevista
+
+### Ações
+- `POST /api/actions` - Cria uma nova ação
+
+### Conclusões
+- `POST /api/conclusions` - Cria uma nova conclusão
+
+## Desenvolvimento
+
+Para desenvolvimento local:
+
+1. Instale as dependências do frontend:
+```bash
+cd frontend
+npm install
+```
+
+2. Instale as dependências do backend:
+```bash
+cd backend
+npm install
+```
+
+3. Execute os serviços em modo de desenvolvimento:
+```bash
+docker-compose -f docker-compose.dev.yml up -d
+```
+
+## Contribuindo
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Faça commit das suas alterações (`git commit -am 'Adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nova-feature`)
+5. Crie um Pull Request
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
